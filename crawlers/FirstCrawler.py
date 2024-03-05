@@ -10,7 +10,7 @@ import pprint
 from crawlers.BaseCrawler import BaseCrawler
 
 class FirstCrawler(BaseCrawler):
-    def dataGet(self):
+    def firstCatGet(self):
         self.driver.get(self.firstUrl)
         wait = WebDriverWait(self.driver, 10)
 
