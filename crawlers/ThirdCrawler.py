@@ -10,23 +10,29 @@ import urllib.parse
 
 from crawlers.BaseCrawler import BaseCrawler
 
-class SecondCrawler(BaseCrawler):
-    def secondCatGet(self):
+class ThirdCrawler(BaseCrawler):
+    def thirdCatGet(self):
+        pprint.pprint('thirdCatGet')
         firstCat = self.cateries.getFirstCat(filePath=self.filePath.getFirstCatFilePath())
 
         for catKey in firstCat.keys():
-            self.driver.get(firstCat[catKey])
-            wait = WebDriverWait(self.driver, 10)
+            secondCat = self.cateries.getSecondCat(filePath=self.filePath.getSecondCatFilePath(catKey))
+            pprint.pprint(secondCat)
+            resultDict = {}
+            httpUrl = self.urls.getBaseUrl()
+            catNo = firstCat[catKey].replace(httpUrl, '')
+            for catKey in secondCat.keys():
+                self.driver.get(self.getPageUrl(topCat=catNo,underlayerCat=secondCat[catKey]))
+                wait = WebDriverWait(self.driver, 10)
 
-            time.sleep(2)
+                time.sleep(2)
 
-            secoundDict = {}
-            for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getSecondLinkSelector()):
-                if not len(elem.text) == 0 and not elem.text == 'すべて':
-                    secoundDict[elem.text.strip()] = elem.get_attribute('value')
+                for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getThirdLinkSelector()):
+                    if not len(elem.text) == 0 and not elem.text == 'すべて':
+                        resultDict[elem.text.strip()] = elem.get_attribute('value')
 
-            dictionary = dict(key=list(secoundDict.keys()),value=list(secoundDict.values()))
-            self.cateries.dictToCsv(dataDict=dictionary, fileName=self.filePath.getSecondCatFilePath(catKey))
+                dictionary = dict(key=list(resultDict.keys()),value=list(resultDict.values()))
+                self.cateries.dictToCsv(dataDict=dictionary, fileName=self.filePath.getThirdCatFilePath(catKey))
 
         self.driver.quit()
 

@@ -18,14 +18,13 @@ class FirstCrawler(BaseCrawler):
 
         linkText = []
         linkHref = []
-        for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectorGet.getFirstLinkTextSelector()):
+        for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getFirstLinkTextSelector()):
             linkText.append(re.sub(re.compile('<.*?>'), '', elem.get_attribute('innerHTML')))
-        for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectorGet.getFirstLinkHrefSelector()):
+        for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getFirstLinkHrefSelector()):
             linkHref.append(re.sub(re.compile('<.*?>'), '', elem.get_attribute('href')))
 
         dictionary = dict(key=linkText,value=linkHref)
 
-        df=pd.DataFrame(dictionary)
-        df.to_csv('./data/first_cat.csv', header=False, index=False, encoding='cp932')
+        self.cateries.dictToCsv(dataDict=dictionary, fileName=self.filePath.getFirstCatFilePath())
 
         self.driver.quit()
