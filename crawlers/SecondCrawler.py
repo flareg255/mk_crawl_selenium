@@ -1,5 +1,8 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
 
 import pandas as pd
 
@@ -12,23 +15,37 @@ from crawlers.BaseCrawler import BaseCrawler
 
 class SecondCrawler(BaseCrawler):
     def secondCatGet(self):
+        pprint.pprint('secondCatGet start')
+
         firstCat = self.cateries.getFirstCat(filePath=self.filePath.getFirstCatFilePath())
 
         for catKey in firstCat.keys():
             self.driver.get(firstCat[catKey])
             wait = WebDriverWait(self.driver, 10)
+            try:
+                wait.until(EC.presence_of_all_elements_located)
+            except TimeoutException as te:
+                pprint.pprint(te)
+                try:
+                    wait.until(EC.presence_of_all_elements_located)
+                except TimeoutException as te2:
+                    pprint.pprint(te2)
+
+            pprint.pprint('secondCatGet rendering ' + catKey)
 
             time.sleep(2)
 
             secoundDict = {}
-            for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getSecondLinkSelector()):
+            for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getUnderLinkSelector('2')):
                 if not len(elem.text) == 0 and not elem.text == 'すべて':
-                    secoundDict[elem.text.strip()] = elem.get_attribute('value')
+                    secoundDict[elem.text.strip().replace('\u3000', ' ')] = elem.get_attribute('value')
 
             dictionary = dict(key=list(secoundDict.keys()),value=list(secoundDict.values()))
-            self.cateries.dictToCsv(dataDict=dictionary, fileName=self.filePath.getSecondCatFilePath(catKey))
+            self.cateries.dictToCsv(dataDict=dictionary, fileName=self.filePath.getSecondCatFilePath(catName=catKey))
 
         self.driver.quit()
+
+        pprint.pprint('secondCatGet end')
 
     def itemsGet(self):
         self.driver.get(self.firstUrl)
@@ -61,10 +78,10 @@ class SecondCrawler(BaseCrawler):
 
         self.driver.quit()
 
-    def getPageUrl(self, topCat, underlayerCat):
-        underlayerCatAry = underlayerCat.split(':')
-        doublequoteAddAry = []
-        doublequoteAddAry.append('"'+ underlayerCatAry[0] + '":' + '""')
-        doublequoteAddAry.append('"'+ underlayerCatAry[0] + ':'+ underlayerCatAry[1]+ '":'+ '""' )
-        underlayerCatStr =  urllib.parse.quote('{' + ','.join(doublequoteAddAry) + '}')
-        return self.baseUrl + topCat + '?categories=' + underlayerCatStr
+    # def getPageUrl(self, topCat, underlayerCat):
+    #     underlayerCatAry = underlayerCat.split(':')
+    #     doublequoteAddAry = []
+    #     doublequoteAddAry.append('"'+ underlayerCatAry[0] + '":' + '""')
+    #     doublequoteAddAry.append('"'+ underlayerCatAry[0] + ':'+ underlayerCatAry[1]+ '":'+ '""' )
+    #     underlayerCatStr =  urllib.parse.quote('{' + ','.join(doublequoteAddAry) + '}')
+    #     return self.baseUrl + topCat + '?categories=' + underlayerCatStr
