@@ -3,8 +3,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-import pandas as pd
-
 import re
 import time
 import pprint
@@ -12,6 +10,10 @@ import pprint
 from crawlers.BaseCrawler import BaseCrawler
 
 class FirstCrawler(BaseCrawler):
+    def __init__(self, driver):
+        super().__init__()
+        self.driver = driver
+
     def firstCatGet(self):
         pprint.pprint('firstCatGet start')
         self.driver.get(self.firstUrl)
@@ -39,7 +41,5 @@ class FirstCrawler(BaseCrawler):
         dictionary = dict(key=linkText,value=linkHref)
 
         self.cateries.dictToCsv(dataDict=dictionary, fileName=self.filePath.getFirstCatFilePath())
-
-        self.driver.quit()
 
         pprint.pprint('firstCatGet end')
