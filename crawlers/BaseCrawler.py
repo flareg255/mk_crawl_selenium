@@ -6,6 +6,7 @@ from model.Urls import Urls
 from model.CssSelectors import CssSelectors
 from model.Categoris import Categories
 from model.FilePath import FilePath
+from service.FileWRService import FileWRService
 
 import time
 import copy
@@ -19,8 +20,9 @@ class BaseCrawler:
     baseUrl = ''
     firstUrl = ''
     cssSelectorGet = None
-    cateries = None
+    catergoies = None
     filePath = None
+    fileWRService = None
 
     def __init__(self):
         self.urls = Urls()
@@ -29,9 +31,11 @@ class BaseCrawler:
 
         self.cssSelectors = CssSelectors()
 
-        self.cateries = Categories()
+        self.catergoies = Categories()
 
         self.filePath = FilePath()
+
+        self.fileWRService = FileWRService()
 
     def catDataToCsv(self, url, catKey, execFunction, layers, underLinkSelector):
         layerList = copy.copy(layers)
@@ -60,6 +64,12 @@ class BaseCrawler:
                 values.append(elem.get_attribute('value'))
 
         dictionary = dict(key=keys,value=values)
-        self.cateries.dictToCsv(dataDict=dictionary, fileName=self.filePath.getCatFilePath(catName=execFunction, layerList=layerList))
+        self.fileWRService.dictToCsv(dataDict=dictionary, fileName=self.filePath.getCatFilePath(catName=execFunction, layerList=layerList))
 
         return dictionary
+
+    def getCatNo(self, url):
+        httpUrl = self.urls.getBaseUrl()
+        catNo = url.replace(httpUrl, '').replace('/', '')
+
+        return catNo

@@ -1,8 +1,3 @@
-
-from selenium.webdriver.common.by import By
-
-
-import time
 import pprint
 
 from crawlers.BaseCrawler import BaseCrawler
@@ -15,7 +10,7 @@ class SecondCrawler(BaseCrawler):
     def secondCatGet(self):
         pprint.pprint('secondCatGet start')
 
-        firstCat = self.cateries.getFirstCat(filePath=self.filePath.getFirstCatFilePath())
+        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=[]))
 
         for catKey in firstCat.keys():
             self.catDataToCsv(url=firstCat[catKey], catKey=catKey, execFunction='second_cat_', layers=[], underLinkSelector='2')

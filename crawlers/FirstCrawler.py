@@ -40,6 +40,6 @@ class FirstCrawler(BaseCrawler):
 
         dictionary = dict(key=linkText,value=linkHref)
 
-        self.cateries.dictToCsv(dataDict=dictionary, fileName=self.filePath.getFirstCatFilePath())
+        self.fileWRService.dictToCsv(dataDict=dictionary, fileName=self.filePath.getCatFilePath(catName='first_cat', layerList=[]))
 
         pprint.pprint('firstCatGet end')
