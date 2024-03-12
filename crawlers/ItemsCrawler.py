@@ -25,31 +25,57 @@ class ItemsCrawler(BaseCrawler):
 
     def itemsGet(self):
         pprint.pprint('itemsGet start')
-        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=[]))
+        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
 
         # self.urls.getPageUrl(topCat=catNo,underlayerCat=secondCat[catKey2])
         # for catKey1 in firstCat.keys():
-        #     self.pageCnt = 1
-        #     self.keys = []
-        #     self.values = []
+        #     self.dataInit()
+
         #     catNo = self.getCatNo(firstCat[catKey1])
         #     categoryFullNo = catNo + '00000000000000'
 
         #     self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=categoryFullNo)
         #     self.recursivePageItemget(url=self.categoryUrl, catKey=catKey1)
 
+        # for catKey1 in firstCat.keys():
+        #     secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat_', layerList=[catKey1]))
+        #     catNo = self.getCatNo(firstCat[catKey1])
+
+        #     for catKey2 in secondCat.keys():
+        #         self.dataInit()
+
+        #         pprint.pprint(self.urls.getPageUrl(topCat=catNo, underlayerCat=secondCat[catKey2]))
+        #         catKey = '_'.join([catKey1, catKey2])
+        #         self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=secondCat[catKey2])
+        #         self.recursivePageItemget(url=self.categoryUrl, catKey=catKey)
+
+        # for catKey1 in firstCat.keys():
+        #     secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
+        #     catNo = self.getCatNo(firstCat[catKey1])
+
+        #     for catKey2 in secondCat.keys():
+        #         thirdCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='third_cat', layerList=[catKey1, catKey2]))
+        #         for catKey3 in thirdCat.keys():
+        #             self.dataInit()
+
+        #             pprint.pprint(self.urls.getPageUrl(topCat=catNo, underlayerCat=thirdCat[catKey3]))
+        #             catKey = '_'.join([catKey1, catKey2, catKey3])
+        #             self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=thirdCat[catKey3])
+        #             self.recursivePageItemget(url=self.categoryUrl, catKey=catKey)
+
         for catKey1 in firstCat.keys():
-            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat_', layerList=[catKey1]))
+            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
             catNo = self.getCatNo(firstCat[catKey1])
 
             for catKey2 in secondCat.keys():
-                self.pageCnt = 1
-                self.keys = []
-                self.values = []
-                pprint.pprint(self.urls.getPageUrl(topCat=catNo, underlayerCat=secondCat[catKey2]))
-                catKey = '_'.join([catKey1, catKey2])
-                self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=secondCat[catKey2])
-                self.recursivePageItemget(url=self.categoryUrl, catKey=catKey)
+                thirdCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1, catKey2]))
+                for catKey3 in thirdCat.keys():
+                    fourthCat = self.catergoies.getUnderCat(filePath=self.filePath.getFourthCatFilePath(catName1=catKey1, catName2=catKey2, catName3=catKey3))
+                    for catKey4 in fourthCat.keys():
+                        pprint.pprint(self.urls.getPageUrl(topCat=catNo, underlayerCat=fourthCat[catKey4]))
+                        catKey = '_'.join([catKey1, catKey2, catKey3, catKey4])
+                        self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=fourthCat[catKey4])
+                        self.recursivePageItemget(url=self.categoryUrl, catKey=catKey)
 
     def recursivePageItemget(self, url, catKey):
         pprint.pprint('recursivePageItemget start')
@@ -65,6 +91,10 @@ class ItemsCrawler(BaseCrawler):
                 wait.until(EC.presence_of_all_elements_located)
             except TimeoutException as te2:
                 pprint.pprint(te2)
+                pprint.pprint('再帰的にアイテム取得失敗')
+                dictionary = dict(key=self.keys,value=self.values)
+                self.fileWRService.dictToCsv(dataDict=dictionary, fileName=self.filePath.getItemFilePath(itemName=catKey))
+                return
 
         javascript = 'var cnt = 0;\
         var scrollVal = 0;\
@@ -74,35 +104,52 @@ class ItemsCrawler(BaseCrawler):
             if (cnt == 4) {\
                 return;\
             }\
-            setTimeout(scroll, 3000);\
+            setTimeout(scroll, 2500);\
         }\
         scroll();'
 
         self.driver.execute_script(javascript)
-        time.sleep(12)
+        time.sleep(9)
 
         httpUrl = self.urls.getRemoveUrlString()
         rtSidRe = self.urls.getRemoveQueryRe()
 
-        for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector()):
-            self.keys.append(re.sub(rtSidRe, '',elem.get_attribute('href').replace(httpUrl, '')))
-            self.values.append(elem.get_attribute('title'))
-
         endFlag = False
-        for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getNextPageBtnSelector()):
-            if self.cssSelectors.getBtnDisableSelector() in elem.get_attribute('class'):
-                endFlag = True
-            pprint.pprint(elem.get_attribute('class'))
+        pprint.pprint('getItemsWrapSelector')
+        pprint.pprint(len(self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector())))
+
+        if len(self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getBtnNextSelector())) == 0:
+            endFlag = True
+        elif len(self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector())) == 0:
+            endFlag = True
+        elif len(self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getNothingDataSelector())) >= 1:
+            endFlag = True
+        else:
+            for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getNextPageBtnSelector()):
+                if self.cssSelectors.getBtnDisableSelector() in elem.get_attribute('class'):
+                    endFlag = True
+                pprint.pprint(elem.get_attribute('class'))
 
         pprint.pprint('endFlag1')
         pprint.pprint(endFlag)
+
         if endFlag:
+            pprint.pprint('recursivePageItemget end')
             dictionary = dict(key=self.keys,value=self.values)
             self.fileWRService.dictToCsv(dataDict=dictionary, fileName=self.filePath.getItemFilePath(itemName=catKey))
             return
         else:
+            for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector()):
+                self.keys.append(re.sub(rtSidRe, '',elem.get_attribute('href').replace(httpUrl, '')))
+                self.values.append(elem.get_attribute('title'))
+
             self.pageCnt += 1
             itemNumber = 60 * self.pageCnt
 
             pprint.pprint(self.urls.getRecursivePageUrl(url=self.categoryUrl, param1=self.pageCnt, param2=itemNumber))
             self.recursivePageItemget(url=self.urls.getRecursivePageUrl(url=self.categoryUrl, param1=self.pageCnt, param2=itemNumber), catKey=catKey)
+
+    def dataInit(self):
+        self.pageCnt = 1
+        self.keys = []
+        self.values = []

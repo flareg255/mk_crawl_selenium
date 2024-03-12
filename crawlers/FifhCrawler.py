@@ -15,10 +15,10 @@ class FifthCrawler(BaseCrawler):
 
     def fifthCatGet(self):
         pprint.pprint('fifthCatGet start')
-        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=[]))
+        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
 
         for catKey1 in firstCat.keys():
-            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat_', layerList=[catKey1]))
+            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
 
             # httpUrl = self.urls.getBaseUrl()
             # catNo = firstCat[catKey1].replace(httpUrl, '')
@@ -27,10 +27,10 @@ class FifthCrawler(BaseCrawler):
 
             for catKey2 in secondCat.keys():
                 # thirdCat = self.catergoies.getUnderCat(filePath=self.filePath.getThirdCatFilePath(catName1=catKey1, catName2=catKey2))
-                thirdCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat_', layerList=[catKey1, catKey2]))
+                thirdCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1, catKey2]))
                 for catKey3 in thirdCat.keys():
                     fourthCat = self.catergoies.getUnderCat(filePath=self.filePath.getFourthCatFilePath(catName1=catKey1, catName2=catKey2, catName3=catKey3))
                     for catKey4 in fourthCat.keys():
-                        self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=thirdCat[catKey4]), catKey=catKey4, execFunction='fifth_cat_', layers=[catKey1, catKey2, catKey3], underLinkSelector='5')
+                        self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=thirdCat[catKey4]), catKey=catKey4, execFunction='fifth_cat', layers=[catKey1, catKey2, catKey3], underLinkSelector='5')
 
         pprint.pprint('fifthCatGet end')

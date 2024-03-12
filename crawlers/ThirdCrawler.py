@@ -15,17 +15,17 @@ class ThirdCrawler(BaseCrawler):
 
     def thirdCatGet(self):
         pprint.pprint('thirdCatGet start')
-        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=[]))
+        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
 
         for catKey1 in firstCat.keys():
             # secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getSecondCatFilePath(catName=catKey1))
-            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat_', layerList=[catKey1]))
+            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
             # httpUrl = self.urls.getBaseUrl()
             # catNo = firstCat[catKey1].replace(httpUrl, '')
 
             catNo = self.getCatNo(firstCat[catKey1])
 
             for catKey2 in secondCat.keys():
-                self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=secondCat[catKey2]), catKey=catKey2, execFunction='third_cat_', layers=[catKey1], underLinkSelector='3')
+                self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=secondCat[catKey2]), catKey=catKey2, execFunction='third_cat', layers=[catKey1], underLinkSelector='3')
 
         pprint.pprint('thirdCatGet end')

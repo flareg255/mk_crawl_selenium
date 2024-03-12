@@ -15,10 +15,10 @@ class FourthCrawler(BaseCrawler):
 
     def fourthCatGet(self):
         pprint.pprint('fourthCatGet start')
-        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=[]))
+        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
 
         for catKey1 in firstCat.keys():
-            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat_', layerList=[catKey1]))
+            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
 
             # httpUrl = self.urls.getBaseUrl()
             # catNo = firstCat[catKey1].replace(httpUrl, '')
@@ -26,8 +26,8 @@ class FourthCrawler(BaseCrawler):
             catNo = self.getCatNo(firstCat[catKey1])
 
             for catKey2 in secondCat.keys():
-                thirdCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat_', layerList=[catKey1, catKey2]))
+                thirdCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='third_cat', layerList=[catKey1, catKey2]))
                 for catKey3 in thirdCat.keys():
-                    self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=thirdCat[catKey3]), catKey=catKey3, execFunction='fourth_cat_', layers=[catKey1, catKey2], underLinkSelector='4')
+                    self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=thirdCat[catKey3]), catKey=catKey3, execFunction='fourth_cat', layers=[catKey1, catKey2], underLinkSelector='4')
 
         pprint.pprint('fourthCatGet end')
