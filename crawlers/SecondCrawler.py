@@ -10,7 +10,7 @@ class SecondCrawler(BaseCrawler):
     def secondCatGet(self):
         pprint.pprint('secondCatGet start')
 
-        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
+        firstCat = self.catergories.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
 
         for catKey in firstCat.keys():
             self.catDataToCsv(url=firstCat[catKey], catKey=catKey, execFunction='second_cat', layers=[], underLinkSelector='2')

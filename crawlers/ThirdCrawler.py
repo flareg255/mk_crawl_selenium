@@ -15,11 +15,11 @@ class ThirdCrawler(BaseCrawler):
 
     def thirdCatGet(self):
         pprint.pprint('thirdCatGet start')
-        firstCat = self.catergoies.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
+        firstCat = self.catergories.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
 
         for catKey1 in firstCat.keys():
-            # secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getSecondCatFilePath(catName=catKey1))
-            secondCat = self.catergoies.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
+            # secondCat = self.catergories.getUnderCat(filePath=self.filePath.getSecondCatFilePath(catName=catKey1))
+            secondCat = self.catergories.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
             # httpUrl = self.urls.getBaseUrl()
             # catNo = firstCat[catKey1].replace(httpUrl, '')
 

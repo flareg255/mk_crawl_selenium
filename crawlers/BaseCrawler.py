@@ -4,7 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from model.Urls import Urls
 from model.CssSelectors import CssSelectors
-from model.Categoris import Categories
+from model.Categories import Categories
 from model.FilePath import FilePath
 from service.FileWRService import FileWRService
 
@@ -20,7 +20,7 @@ class BaseCrawler:
     baseUrl = ''
     firstUrl = ''
     cssSelectorGet = None
-    catergoies = None
+    catergories = None
     filePath = None
     fileWRService = None
 
@@ -31,7 +31,7 @@ class BaseCrawler:
 
         self.cssSelectors = CssSelectors()
 
-        self.catergoies = Categories()
+        self.catergories = Categories()
 
         self.filePath = FilePath()
 
@@ -64,7 +64,7 @@ class BaseCrawler:
                 values.append(elem.get_attribute('value'))
 
         dictionary = dict(key=keys,value=values)
-        self.fileWRService.dictToCsv(dataDict=dictionary, fileName=self.filePath.getCatFilePath(catName=execFunction, layerList=layerList))
+        self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getCatFilePath(catName=execFunction, layerList=layerList))
 
         return dictionary
 
