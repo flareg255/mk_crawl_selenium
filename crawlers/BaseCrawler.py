@@ -9,6 +9,7 @@ from model.FilePath import FilePath
 from service.FileWRService import FileWRService
 
 import time
+import timeout_decorator
 import copy
 import pprint
 
@@ -37,21 +38,34 @@ class BaseCrawler:
 
         self.fileWRService = FileWRService()
 
+    @timeout_decorator.timeout(60)
     def catDataToCsv(self, url, catKey, execFunction, layers, underLinkSelector):
+        pprint.pprint('catDataToCsv')
         layerList = copy.copy(layers)
         layerList.append(catKey)
 
-        self.driver.get(url)
-        wait = WebDriverWait(self.driver, 10)
         try:
+            self.driver.get(url)
+            wait = WebDriverWait(self.driver, 10)
             wait.until(EC.presence_of_all_elements_located)
         except TimeoutException as te:
-            pprint.pprint(te)
+            self.fileWRService.logOutPut(execFunction +' TimeoutException1 ' + catKey, self.filePath.getLogFilePath())
+            pprint.pprint(execFunction +' TimeoutException1 ' + catKey)
+            pprint.pprint(str(te))
             try:
+                self.driver.quit()
+                self.driver.get(url)
+                wait = WebDriverWait(self.driver, 10)
                 wait.until(EC.presence_of_all_elements_located)
             except TimeoutException as te2:
-                pprint.pprint(te2)
+                self.driver.quit()
+                self.fileWRService.logOutPut(execFunction +' TimeoutException2 ' + catKey, self.filePath.getLogFilePath())
+                pprint.pprint(execFunction +' TimeoutException2 ' + catKey)
+                pprint.pprint(str(te2))
+                dictionary = {}
+                return dictionary
 
+        self.fileWRService.logOutPut(execFunction +' rendering ' + catKey, self.filePath.getLogFilePath())
         pprint.pprint(execFunction +' rendering ' + catKey)
 
         time.sleep(2)

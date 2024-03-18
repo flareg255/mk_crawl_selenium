@@ -10,24 +10,39 @@ import pprint
 from crawlers.BaseCrawler import BaseCrawler
 
 class FirstCrawler(BaseCrawler):
+    start = 'firstCatGet start'
+    rendering = 'firstCatGet rendering'
+    exceptionStart = 'firstCatGet exception----------------------------------------'
+    end = 'firstCatGet end'
+
     def __init__(self, driver):
         super().__init__()
         self.driver = driver
 
     def firstCatGet(self):
-        pprint.pprint('firstCatGet start')
-        self.driver.get(self.firstUrl)
-        wait = WebDriverWait(self.driver, 10)
+        self.fileWRService.logOutPut(self.start, self.filePath.getLogFilePath())
+        pprint.pprint(self.start)
+        
 
         try:
+            self.driver.get(self.firstUrl)
+            wait = WebDriverWait(self.driver, 10)
             wait.until(EC.presence_of_all_elements_located)
         except TimeoutException as te:
             pprint.pprint(te)
             try:
+                self.driver.quit()
+                self.driver.get(self.firstUrl)
+                wait = WebDriverWait(self.driver, 10)
                 wait.until(EC.presence_of_all_elements_located)
             except TimeoutException as te2:
+                self.driver.quit()
+                self.fileWRService.flagOutPut('0', self.filePath.getFlagFilePath())
                 pprint.pprint(te2)
-        pprint.pprint('firstCatGet rendering')
+                return
+
+        self.fileWRService.logOutPut(self.rendering, self.filePath.getLogFilePath())
+        pprint.pprint(self.rendering)
 
         time.sleep(2)
 
@@ -40,6 +55,16 @@ class FirstCrawler(BaseCrawler):
 
         dictionary = dict(key=linkText,value=linkHref)
 
-        self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
+        try:
+            self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
+        except Exception as e:
+            self.fileWRService.logOutPut(self.exceptionStart, self.filePath.getLogFilePath())
+            pprint.pprint(self.exceptionStart)
+            self.fileWRService.logOutPut(str(e), self.filePath.getLogFilePath())
+            pprint.pprint(str(e))
+            self.fileWRService.flagOutPut('0', self.filePath.getFlagFilePath())
+            return
 
-        pprint.pprint('firstCatGet end')
+        self.fileWRService.flagOutPut('1', self.filePath.getFlagFilePath())
+        self.fileWRService.logOutPut(self.end, self.filePath.getLogFilePath())
+        pprint.pprint(self.end)

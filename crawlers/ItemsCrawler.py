@@ -95,6 +95,7 @@ class ItemsCrawler(BaseCrawler):
                 pprint.pprint('再帰的にアイテム取得失敗')
                 dictionary = dict(key=self.keys,value=self.values)
                 self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getItemFilePath(itemName=catKey))
+                self.fileWRService.flagOutPut('4', self.filePath.getFlagFilePath())
                 return
 
         javascript = 'var cnt = 0;\
@@ -135,6 +136,7 @@ class ItemsCrawler(BaseCrawler):
             pprint.pprint('recursivePageItemget end')
             dictionary = dict(key=self.keys,value=self.values)
             self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getItemFilePath(itemName=catKey))
+            self.fileWRService.flagOutPut('5', self.filePath.getFlagFilePath())
             return
         else:
             self.itemHtmlToList(elements=self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector()))

@@ -9,23 +9,35 @@ import pprint
 from crawlers.BaseCrawler import BaseCrawler
 
 class ThirdCrawler(BaseCrawler):
+    start = 'thirdCatGet start'
+    rendering = 'thirdCatGet rendering'
+    exceptionStart = 'thirdCatGet exception----------------------------------------'
+    end = 'thirdCatGet end'
+
     def __init__(self, driver):
         super().__init__()
         self.driver = driver
 
     def thirdCatGet(self):
-        pprint.pprint('thirdCatGet start')
+        self.fileWRService.logOutPut(self.start, self.filePath.getLogFilePath())
+        pprint.pprint(self.start)
+
         firstCat = self.catergories.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
 
         for catKey1 in firstCat.keys():
-            # secondCat = self.catergories.getUnderCat(filePath=self.filePath.getSecondCatFilePath(catName=catKey1))
             secondCat = self.catergories.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
-            # httpUrl = self.urls.getBaseUrl()
-            # catNo = firstCat[catKey1].replace(httpUrl, '')
-
             catNo = self.getCatNo(firstCat[catKey1])
 
             for catKey2 in secondCat.keys():
-                self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=secondCat[catKey2]), catKey=catKey2, execFunction='third_cat', layers=[catKey1], underLinkSelector='3')
+                try:
+                    self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=secondCat[catKey2]), catKey=catKey2, execFunction='third_cat', layers=[catKey1], underLinkSelector='3')
+                except Exception as e:
+                    self.fileWRService.logOutPut(str(e), self.filePath.getLogFilePath())
+                    pprint.pprint(self.exceptionStart)
+                    pprint.pprint(str(e))
+                    self.fileWRService.flagOutPut('2', self.filePath.getFlagFilePath())
+                    return
 
-        pprint.pprint('thirdCatGet end')
+        self.fileWRService.flagOutPut('3', self.filePath.getFlagFilePath())
+        self.fileWRService.logOutPut(self.end, self.filePath.getLogFilePath())
+        pprint.pprint(self.end)
