@@ -17,14 +17,15 @@ from model.FilePath import FilePath
 
 from items_get.spiders.items_get import ItemsGetSpider
 
+import sys
 import pprint
-from timeout_decorator import TimeoutError
+from timeout_decorator import timeout, TimeoutError
 
 class Main:
     fileWRService = None
     filePath = None
-    setDriver = None
-    driver = None
+    # setDriver = None
+    # driver = None
 
     firstCrawler = None
     secondCrawler = None
@@ -45,76 +46,80 @@ class Main:
         self.processFlag = 0
         self.filePath = FilePath()
 
-        self.setDriver = SetDriver()
-        self.driver = self.setDriver.getDriver()
+        # self.setDriver = SetDriver()
+        # self.driver = self.setDriver.getDriver()
 
-        self.firstCrawler = FirstCrawler(driver=self.driver)
-        self.secondCrawler = SecondCrawler(driver=self.driver)
-        self.thirdCrawler = ThirdCrawler(driver=self.driver)
-        self.fourthCrawler = FourthCrawler(driver=self.driver)
+
         # self.fifthCrawler = FifthCrawler()
-
-        self.itemsCrawler = ItemsCrawler(driver=self.driver)
 
     def dataGet(self):
         self.processFlag = int(self.fileWRService.flagInPut(filePath=self.filePath.getFlagFilePath()))
         pprint.pprint(self.processFlag)
         if self.processFlag == 0:
-            try:
-                self.firstCrawler.firstCatGet()
-            except TimeoutError:
-                try:
-                    self.firstCrawler.firstCatGet()
-                except TimeoutError:
-                    pprint.pprint('first time out')
+            self.firstCrawler = FirstCrawler()
+            # try:
+            self.firstCrawler.firstCatGet()
+            # except TimeoutError:
+            #     try:
+            #         self.firstCrawler.firstCatGet()
+            #     except TimeoutError:
+            #         pprint.pprint('first time out')
         elif self.processFlag == 1:
-            try:
-                self.secondCrawler.secondCatGet()
-            except TimeoutError:
-                try:
-                    self.secondCrawler.secondCatGet()
-                except TimeoutError:
-                    pprint.pprint('second time out')
+            self.secondCrawler = SecondCrawler()
+            # try:
+            self.secondCrawler.secondCatGet()
+            # except TimeoutError:
+            #     try:
+            #         self.secondCrawler.secondCatGet()
+            #     except TimeoutError:
+            #         pprint.pprint('second time out')
         elif self.processFlag == 2:
-            try:
-                self.thirdCrawler.thirdCatGet()
-            except TimeoutError:
-                try:
-                    self.thirdCrawler.thirdCatGet()
-                except TimeoutError:
-                    pprint.pprint('third time out')
+            self.thirdCrawler = ThirdCrawler()
+            # try:
+            self.thirdCrawler.thirdCatGet()
+            # except TimeoutError:
+            #     try:
+            #         self.thirdCrawler.thirdCatGet()
+            #     except TimeoutError:
+            #         pprint.pprint('third time out')
         elif self.processFlag == 3:
-            try:
-                self.fourthCrawler.fourthCatGet()
-            except TimeoutError:
-                try:
-                    self.fourthCrawler.fourthCatGet()
-                except TimeoutError:
-                    pprint.pprint('fourth time out')
+            self.fourthCrawler = FourthCrawler()
+            # try:
+            self.fourthCrawler.fourthCatGet()
+            # except TimeoutError:
+            #     try:
+            #         self.fourthCrawler.fourthCatGet()
+            #     except TimeoutError:
+            #         pprint.pprint('fourth time out')
             # self.fifthCrawler.fifthCatGet()
         elif self.processFlag == 4:
-            try:
-                self.itemsCrawler.itemsGet()
-            except TimeoutError:
-                try:
-                    self.itemsCrawler.itemsGet()
-                except TimeoutError:
-                    pprint.pprint('itemsGet time out')
+            self.itemsCrawler = ItemsCrawler()
+            # try:
+            self.itemsCrawler.itemsGet()
+            # except TimeoutError:
+            #     try:
+            #         self.itemsCrawler.itemsGet()
+            #     except TimeoutError:
+            #         pprint.pprint('itemsGet time out')
 
-        self.driver.quit()
+        # self.driver.quit()
 
-
-
+timeLimit = 8 * 60 * 60
+@timeout(timeLimit)
 def main():
     main = Main()
     main.dataGet()
 
 if __name__ == "__main__":
-    main()
-
     fileWRService = FileWRService()
     filePath = FilePath()
     processFlag = fileWRService.flagInPut(filePath=filePath.getFlagFilePath())
+    try:
+        main()
+    except TimeoutError:
+        pprint.pprint(processFlag + ' time out')
+        sys.exit()
+
     if processFlag == 5:
         settings = get_project_settings()
         configure_logging(settings)

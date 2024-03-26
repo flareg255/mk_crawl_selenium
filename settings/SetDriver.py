@@ -11,13 +11,17 @@ class SetDriver:
     options = None
     driver = None
 
-    def __init__(self):
+
+    def getDriver(self):
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--headless')
         self.options.add_argument("--no-sandbox")
         self.options.add_argument('--disable-dev-shm-usage')
+        self.options.add_experimental_option(
+            "prefs", {
+                "profile.managed_default_content_settings.images": 2,
+            }
+        )
 
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=self.options)
-
-    def getDriver(self):
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=self.options)
         return self.driver
