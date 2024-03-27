@@ -7,9 +7,11 @@ import re
 import time
 import pprint
 import shutil
+import sys
 
 
 from crawlers.BaseCrawler import BaseCrawler
+from settings.SetDriver import SetDriver
 
 class ItemsCrawler(BaseCrawler):
     pageCnt = 1
@@ -47,13 +49,14 @@ class ItemsCrawler(BaseCrawler):
                 catKey1 = fileNameExplode[0]
                 catKey2 = fileNameExplode[1]
                 catKey3 = fileNameExplode[2].replace('.csv', '')
-                fourthCat = self.catergories.getUnderCat(filePath=self.dataDir + fileName)
-                for catKey4 in fourthCat.keys():
+                fourthCat = self.catergories.getUnderCat2(filePath=self.dataDir + fileName)
+                # for catKey4 in fourthCat.keys():
+                for index, row in fourthCat.iterrows():
                     self.dataInit()
-                    pprint.pprint(self.urls.getPageUrl(topCat=catNo, underlayerCat=fourthCat[catKey4]))
-                    catKey = '_'.join([catKey1, catKey2, catKey3, catKey4])
-                    self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=fourthCat[catKey4])
-                    self.recursivePageItemget(url=self.categoryUrl, catKey=catKey)
+                    # pprint.pprint(self.urls.getPageUrl(topCat=catNo, underlayerCat=row['full_category_id']))
+                    # catKey = '_'.join([catKey1, catKey2, catKey3, catKey4])
+                    self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=row['full_category_id'])
+                    self.recursivePageItemget(url=self.categoryUrl, catKey=index)
 
                 shutil.move(self.dataDir + self.fileName, self.archiveDir + self.fileName)
 
@@ -86,7 +89,10 @@ class ItemsCrawler(BaseCrawler):
 
     def recursivePageItemget(self, url, catKey):
         pprint.pprint('recursivePageItemget start')
+        pprint.pprint(url)
 
+        self.setDriver = SetDriver()
+        self.driver = self.setDriver.getDriver()
         self.driver.get(url)
         wait = WebDriverWait(self.driver, 10)
 
@@ -102,7 +108,8 @@ class ItemsCrawler(BaseCrawler):
                 dictionary = dict(key=self.keys,value=self.values)
                 self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getItemFilePath(itemName=catKey))
                 self.fileWRService.flagOutPut('4', self.filePath.getFlagFilePath())
-                return
+                sys.exit()
+                # return
 
         pprint.pprint('h1 text')
         for elem in self.driver.find_elements(By.CSS_SELECTOR, 'h1'):

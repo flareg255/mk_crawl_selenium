@@ -45,7 +45,7 @@ class BaseCrawler:
         pprint.pprint('catDataToCsv')
         self.setDriver = SetDriver()
         self.driver = self.setDriver.getDriver()
-        layerList = copy.copy(layers)
+        layerList = copy.deepcopy(layers)
         layerList.append(catKey)
 
         try:
@@ -115,7 +115,7 @@ class BaseCrawler:
                     firstCategoryId.append(catNoList[0])
                     secondCategoryId.append(catNoList[1])
                     thirdCategoryId.append(catNoList[2])
-                    fourthCategoryId.append(catNoList[4])
+                    fourthCategoryId.append(catNoList[3])
 
                 categoryDepth.append(underLinkSelector)
 

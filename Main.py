@@ -19,7 +19,7 @@ from items_get.spiders.items_get import ItemsGetSpider
 
 import sys
 import pprint
-from timeout_decorator import timeout, TimeoutError
+# from timeout_decorator import timeout, TimeoutError
 
 class Main:
     fileWRService = None
@@ -105,7 +105,7 @@ class Main:
         # self.driver.quit()
 
 timeLimit = 8 * 60 * 60
-@timeout(timeLimit)
+# @timeout(timeLimit)
 def main():
     main = Main()
     main.dataGet()
