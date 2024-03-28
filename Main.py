@@ -95,12 +95,49 @@ class Main:
         elif self.processFlag == 4:
             self.itemsCrawler = ItemsCrawler()
             # try:
-            self.itemsCrawler.itemsGet()
+            self.itemsCrawler.itemsGet(layer=0)
             # except TimeoutError:
             #     try:
             #         self.itemsCrawler.itemsGet()
             #     except TimeoutError:
             #         pprint.pprint('itemsGet time out')
+        elif self.processFlag == 5:
+            self.itemsCrawler = ItemsCrawler()
+            # try:
+            self.itemsCrawler.itemsGet(layer=1)
+            # except TimeoutError:
+            #     try:
+            #         self.itemsCrawler.itemsGet()
+            #     except TimeoutError:
+            #         pprint.pprint('itemsGet time out')
+        elif self.processFlag == 6:
+            self.itemsCrawler = ItemsCrawler()
+            # try:
+            self.itemsCrawler.itemsGet(layer=2)
+            # except TimeoutError:
+            #     try:
+            #         self.itemsCrawler.itemsGet()
+            #     except TimeoutError:
+            #         pprint.pprint('itemsGet time out')
+        elif self.processFlag == 7:
+            self.itemsCrawler = ItemsCrawler()
+            # try:
+            self.itemsCrawler.itemsGet(layer=3)
+            # except TimeoutError:
+            #     try:
+            #         self.itemsCrawler.itemsGet()
+            #     except TimeoutError:
+            #         pprint.pprint('itemsGet time out')
+        elif self.processFlag == 8:
+            self.itemsCrawler = ItemsCrawler()
+            # try:
+            self.itemsCrawler.itemsGet(layer=4)
+            # except TimeoutError:
+            #     try:
+            #         self.itemsCrawler.itemsGet()
+            #     except TimeoutError:
+            #         pprint.pprint('itemsGet time out')
+
 
         # self.driver.quit()
 

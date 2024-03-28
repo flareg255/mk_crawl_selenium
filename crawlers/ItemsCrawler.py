@@ -8,6 +8,7 @@ import time
 import pprint
 import shutil
 import sys
+import os
 
 
 from crawlers.BaseCrawler import BaseCrawler
@@ -22,7 +23,7 @@ class ItemsCrawler(BaseCrawler):
     dataDir = ''
     archiveDir = ''
     fileName = ''
-    FileNone = 'fourthFileNone'
+    FileNone = ' FileNone'
 
     def __init__(self):
         super().__init__()
@@ -31,61 +32,49 @@ class ItemsCrawler(BaseCrawler):
         self.values = []
         self.categoryUrl = ''
 
-    def itemsGet(self):
+    def itemsGet(self, layer):
         pprint.pprint('itemsGet start')
-        # firstCat = self.catergories.getFirstCat(filePath=self.filePath.getCatFilePath(catName='first_cat', layerList=['first_cat']))
 
-        prevCat = 'fourth'
+        layers = ['first','second','third','fourth']
+        baseLayer = 5
+        catlayer = layers[layer]
         self.baseDir = self.filePath.getBaseDirFilePath()
-        self.dataDir = self.baseDir + prevCat + '_cat/'
-        self.archiveDir = self.filePath.getArchiveDirFilePath(cat=prevCat)
-        categoryDict = self.catergories.getFirstCatString()
-        if not len(self.filePath.getDirFilePath(prevCat)) == 0:
-            for fileName in self.filePath.getDirFilePath(prevCat):
-                self.fileName = fileName
-                fileNameExplode = fileName.split('_')
+        self.dataDir = self.filePath.getProcessDirFilePath(cat=catlayer)
+        self.archiveDir = self.filePath.getArchiveDirFilePath(cat=catlayer)
+        # categoryDict = self.catergories.getFirstCatString()
+        if not len(os.listdir(self.dataDir)) == 0:
+            for fileName in os.listdir(self.dataDir):
+                # self.fileName = fileName
+                # fileNameExplode = fileName.split('_')
 
-                catNo = categoryDict[fileNameExplode[0]]
-                catKey1 = fileNameExplode[0]
-                catKey2 = fileNameExplode[1]
-                catKey3 = fileNameExplode[2].replace('.csv', '')
-                fourthCat = self.catergories.getUnderCat2(filePath=self.dataDir + fileName)
-                # for catKey4 in fourthCat.keys():
-                for index, row in fourthCat.iterrows():
+                # catNo = categoryDict[fileNameExplode[0]]
+                # catDf = self.catergories.getUnderCat2(filePath=self.dataDir + fileName)
+                catDf = self.fileWRService.csvToDataframe(self.dataDir + fileName)
+
+                for index, row in catDf.iterrows():
+                    catNo = row['first_category_id'][0:3]
                     self.dataInit()
-                    # pprint.pprint(self.urls.getPageUrl(topCat=catNo, underlayerCat=row['full_category_id']))
-                    # catKey = '_'.join([catKey1, catKey2, catKey3, catKey4])
-                    self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=row['full_category_id'])
+
+                    if catlayer == 'first':
+                        self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=str(catNo) + '00000000000000')
+                    else:
+                        self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=row['full_category_id'])
                     self.recursivePageItemget(url=self.categoryUrl, catKey=index)
 
                 shutil.move(self.dataDir + self.fileName, self.archiveDir + self.fileName)
 
-            self.fileWRService.flagOutPut('5', self.filePath.getFlagFilePath())
+                if len(os.listdir(self.dataDir)) == 0:
+                    nextLayer = baseLayer + layer
+                    self.fileWRService.flagOutPut(nextLayer, self.filePath.getFlagFilePath())
 
-            self.driver.quit()
-            return
+                self.driver.quit()
+                return
         else:
-            self.fileWRService.flagOutPut('4', self.filePath.getFlagFilePath())
-            pprint.pprint(self.FileNone)
+            nextLayer = baseLayer + layer - 1
+            self.fileWRService.flagOutPut(str(nextLayer), self.filePath.getFlagFilePath())
+            pprint.pprint(self.dataDir + self.FileNone)
 
-            # self.driver.quit()
             return
-
-
-        # for catKey1 in firstCat.keys():
-        #     secondCat = self.catergories.getUnderCat(filePath=self.filePath.getCatFilePath(catName='second_cat', layerList=[catKey1]))
-        #     catNo = self.getCatNo(firstCat[catKey1])
-
-        #     for catKey2 in secondCat.keys():
-        #         thirdCat = self.catergories.getUnderCat(filePath=self.filePath.getCatFilePath(catName='third_cat', layerList=[catKey1, catKey2]))
-        #         for catKey3 in thirdCat.keys():
-        #             fourthCat = self.catergories.getUnderCat(filePath=self.filePath.getCatFilePath(catName='fourth_cat', layerList=[catKey1, catKey2, catKey3]))
-                    # for catKey4 in fourthCat.keys():
-                    #     self.dataInit()
-                    #     pprint.pprint(self.urls.getPageUrl(topCat=catNo, underlayerCat=fourthCat[catKey4]))
-                    #     catKey = '_'.join([catKey1, catKey2, catKey3, catKey4])
-                    #     self.categoryUrl = self.urls.getPageUrl(topCat=catNo, underlayerCat=fourthCat[catKey4])
-                    #     self.recursivePageItemget(url=self.categoryUrl, catKey=catKey)
 
     def recursivePageItemget(self, url, catKey):
         pprint.pprint('recursivePageItemget start')
@@ -94,20 +83,27 @@ class ItemsCrawler(BaseCrawler):
         self.setDriver = SetDriver()
         self.driver = self.setDriver.getDriver()
         self.driver.get(url)
-        wait = WebDriverWait(self.driver, 10)
+        wait = WebDriverWait(self.driver, 30)
 
         try:
             wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector())))
         except TimeoutException as te:
             pprint.pprint(te)
             try:
+                self.driver.quit()
+                self.setDriver = SetDriver()
+                self.driver = self.setDriver.getDriver()
+                self.driver.get(url)
+                wait = WebDriverWait(self.driver, 30)
                 wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector())))
             except TimeoutException as te2:
                 pprint.pprint(te2)
                 pprint.pprint('再帰的にアイテム取得失敗')
+                pprint.pprint(url)
                 dictionary = dict(key=self.keys,value=self.values)
                 self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getItemFilePath(itemName=catKey))
                 self.fileWRService.flagOutPut('4', self.filePath.getFlagFilePath())
+                self.driver.quit()
                 sys.exit()
                 # return
 
@@ -153,15 +149,12 @@ class ItemsCrawler(BaseCrawler):
             pprint.pprint('recursivePageItemget end')
             dictionary = dict(key=self.keys,value=self.values)
             self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getItemFilePath(itemName=catKey))
-            pprint.pprint(self.dataDir + self.fileName)
-            pprint.pprint(self.archiveDir + self.fileName)
+
             self.driver.quit()
+            pprint.pprint('self.driver.quit()')
             return
         else:
             self.itemHtmlToList(elements=self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector()))
-            # for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getItemsWrapSelector()):
-            #     self.keys.append(re.sub(rtSidRe, '',elem.get_attribute('href').replace(httpUrl, '')))
-            #     self.values.append(elem.get_attribute('title'))
 
             self.pageCnt += 1
             itemNumber = 60 * self.pageCnt

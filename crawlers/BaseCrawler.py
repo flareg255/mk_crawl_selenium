@@ -92,7 +92,6 @@ class BaseCrawler:
         for elem in self.driver.find_elements(By.CSS_SELECTOR, self.cssSelectors.getUnderLinkSelector(underLinkSelector)):
             if not len(elem.text) == 0 and not elem.text == 'すべて':
                 keys.append(elem.text.strip().replace('\u3000', ' '))
-                # values.append(elem.get_attribute('value'))
 
                 catNoList = elem.get_attribute('value').split(':')
                 fullCategoryId.append(elem.get_attribute('value'))
@@ -119,7 +118,6 @@ class BaseCrawler:
 
                 categoryDepth.append(underLinkSelector)
 
-        # dictionary = dict(key=keys,value=values)
         dictionary = dict(category_name=keys, full_category_id=fullCategoryId, first_category_id=firstCategoryId, second_category_id=secondCategoryId, third_category_id=thirdCategoryId, fourth_category_id=fourthCategoryId, category_depth=categoryDepth)
         self.fileWRService.toCsv(datas=dictionary, fileName=self.filePath.getCatFilePath(catName=execFunction, layerList=layerList))
 

@@ -28,7 +28,7 @@ class FourthCrawler(BaseCrawler):
         prevCat = 'third'
         baseDir = self.filePath.getBaseDirFilePath()
         dataDir = baseDir + prevCat + '_cat/'
-        archiveDir = self.filePath.getArchiveDirFilePath(cat=prevCat)
+        archiveDir = self.filePath.getProcessDirFilePath(cat=prevCat)
         categoryDict = self.catergories.getFirstCatString()
         if not len(self.filePath.getDirFilePath(prevCat)) == 0:
             for fileName in self.filePath.getDirFilePath(prevCat):
@@ -39,7 +39,6 @@ class FourthCrawler(BaseCrawler):
                 catKey2 = fileNameExplode[1].replace('.csv', '')
                 thirdCat = self.catergories.getUnderCat2(filePath=dataDir + fileName)
                 for index, row in thirdCat.iterrows():
-                    # pprint.pprint(row)
                     catNo = row['first_category_id'][0:3]
                     self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo, underlayerCat=row['full_category_id']), catKey=index, execFunction='fourth_cat', layers=[catKey1,catKey2], underLinkSelector='4')
                 shutil.move(dataDir + fileName, archiveDir + fileName)
@@ -47,33 +46,8 @@ class FourthCrawler(BaseCrawler):
             self.fileWRService.flagOutPut('4', self.filePath.getFlagFilePath())
             self.fileWRService.logOutPut(self.end, self.filePath.getLogFilePath())
             pprint.pprint(self.end)
+
             return
-            #     for catKey3 in thirdCat.keys():
-            #         # try:
-            #         self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=thirdCat[catKey3]), catKey=catKey3, execFunction='fourth_cat', layers=[catKey1, catKey2], underLinkSelector='4')
-            #         # except Exception as e:
-            #         #     self.driver.quit()
-            #         #     self.fileWRService.logOutPut(str(e), self.filePath.getLogFilePath())
-            #         #     pprint.pprint(self.exceptionStart)
-            #         #     pprint.pprint(str(e))
-            #         #     try:
-            #         #         self.catDataToCsv(url=self.urls.getPageUrl(topCat=catNo,underlayerCat=thirdCat[catKey3]), catKey=catKey3, execFunction='fourth_cat', layers=[catKey1, catKey2], underLinkSelector='4')
-            #         #     except Exception as e:
-            #         #         self.driver.quit()
-            #         #         self.fileWRService.logOutPut(str(e), self.filePath.getLogFilePath())
-            #         #         pprint.pprint(self.exceptionStart)
-            #         #         pprint.pprint(str(e))
-            #         #         self.fileWRService.flagOutPut('3', self.filePath.getFlagFilePath())
-            #         #         sys.exit()
-            #     shutil.move(dataDir + fileName, archiveDir + fileName)
-
-            # self.fileWRService.flagOutPut('4', self.filePath.getFlagFilePath())
-            # self.fileWRService.logOutPut(self.end, self.filePath.getLogFilePath())
-            # pprint.pprint(self.end)
-
-            # # self.driver.quit()
-
-            # return
         else:
             self.fileWRService.flagOutPut('2', self.filePath.getFlagFilePath())
             pprint.pprint(self.FileNone)
